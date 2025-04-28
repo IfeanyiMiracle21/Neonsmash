@@ -91,6 +91,7 @@
   let bricks;
   let isGameRunning = false;
 
+  // Initialize game variables
   function initGame() {
     x = canvas.width / 2;
     y = canvas.height - 30;
@@ -109,8 +110,14 @@
     isGameRunning = true;
   }
 
+  // Detect key presses for desktop controls
   document.addEventListener("keydown", keyDownHandler, false);
   document.addEventListener("keyup", keyUpHandler, false);
+
+  // Handle touch start for mobile controls
+  let touchStartX = 0;
+  canvas.addEventListener("touchstart", touchStartHandler, false);
+  canvas.addEventListener("touchmove", touchMoveHandler, false);
 
   function keyDownHandler(e) {
     if(e.key === "Right" || e.key === "ArrowRight") {
@@ -126,6 +133,24 @@
     } else if(e.key === "Left" || e.key === "ArrowLeft") {
       leftPressed = false;
     }
+  }
+
+  function touchStartHandler(e) {
+    touchStartX = e.touches[0].clientX;
+  }
+
+  function touchMoveHandler(e) {
+    let touchMoveX = e.touches[0].clientX;
+    let deltaX = touchMoveX - touchStartX;
+
+    if (deltaX > 0 && paddleX < canvas.width - paddleWidth) {
+      paddleX += 7;
+    } else if (deltaX < 0 && paddleX > 0) {
+      paddleX -= 7;
+    }
+
+    touchStartX = touchMoveX;
+    e.preventDefault();
   }
 
   function collisionDetection() {
@@ -223,12 +248,6 @@
           paddleX = (canvas.width - paddleWidth) / 2;
         }
       }
-    }
-
-    if(rightPressed && paddleX < canvas.width - paddleWidth) {
-      paddleX += 7;
-    } else if(leftPressed && paddleX > 0) {
-      paddleX -= 7;
     }
 
     x += dx;
